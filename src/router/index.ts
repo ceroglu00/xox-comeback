@@ -16,14 +16,17 @@ const router = createRouter({
     routes: [
         {
             path: '/',
+            name:"Home",
             component: Anasayfa,
         },
         {
             path: '/login',
+            name:"Login",
             component: LoginComponent,
         },
         {
             path: '/game',
+            name:"Game",
             component: GamePage,
             beforeEnter: (to, from, next) => {
                 if (!localStorage.getItem("username")) {

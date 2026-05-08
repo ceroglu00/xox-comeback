@@ -1,5 +1,8 @@
 <template>
 
+
+  <v-btn @click="userStore.TEST()">TEST</v-btn>
+
   <v-container>
     Oyuncu: {{userStore.username}}
   </v-container>
@@ -8,7 +11,7 @@
     <v-row>
       <v-col
         v-for="(cell,index) in 9"
-        class="v-col-4 pa-0"
+        class="v-col--cols-4 pa-0"
       >
         <div
           class="

@@ -1,6 +1,7 @@
 <template>
   <v-container fluid class="pa-0">
 
+
     <!-- HERO -->
     <v-container class="py-16 text-center">
       <v-row justify="center">
@@ -10,7 +11,7 @@
             Stratejini konuştur, rakibini alt et ve XOX dünyasında zirveye çık.
           </p>
 
-          <v-btn color="primary" size="large" class="mr-4">
+          <v-btn :to="{name:'Game'}" color="primary" size="large" class="mr-4">
             Hemen Oyna
           </v-btn>
 

@@ -1,6 +1,8 @@
 // Utilities
 import {defineStore} from 'pinia'
 import router from "@/router";
+import {GetUser, CreateUser} from '../database/database.ts'
+import {Notification} from "@/helpers/notificationHelper.ts";
 
 export const useUserStore = defineStore('userStore', {
     state: () => ({
@@ -8,14 +10,14 @@ export const useUserStore = defineStore('userStore', {
         username: ""
     }),
     actions: {
-        Login(id, password) {
+        async Login(id, password) {
             // KULLANICI LOGIN OLACAK
-            if (id == "admin" && password == '123') {
+            if (await GetUser(id, password)) {
                 // GİRİŞ BAŞARILI
                 this.username = id;
                 this.isLoggedIn = true;
 
-                localStorage.setItem("username",id);
+                localStorage.setItem("username", id);
 
                 router.push("/game");
             } else {
@@ -30,15 +32,26 @@ export const useUserStore = defineStore('userStore', {
             localStorage.removeItem("username");
             router.push("/");
         },
-        AutoLogin(){
+        AutoLogin() {
             var userName = localStorage.getItem("username");
             if (userName) {
                 // kullanıcı daha önceden login olmuş demektir
                 this.username = userName;
                 this.isLoggedIn = true;
-            }else{
+            } else {
                 // kullanıcı login olmamış. AutoLogin iptal
             }
+        },
+        async CreateUser(username, password) {
+            if (await CreateUser(username, password)) {
+                // KULLANICI BAŞARIYLA OLUŞTURULDU.
+                Notification("KAYIT BAŞARILI", "success")
+            } else {
+                Notification("KAYIT HATASI", "error")
+            }
+        },
+        TEST() {
+            this.CreateUser("qwdqwd", "qwdqwdqwd");
         }
     }
 })
