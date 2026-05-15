@@ -1,20 +1,22 @@
 <template>
 
 
-  <v-btn @click="userStore.TEST()">TEST</v-btn>
+  <CreateLobby v-if="!gameStore.currentGame"></CreateLobby>
 
-  <v-container>
-    Oyuncu: {{userStore.username}}
-  </v-container>
+  <div v-else>
 
-  <v-container class="pa-2" fluid>
-    <v-row>
-      <v-col
-        v-for="(cell,index) in 9"
-        class="v-col--cols-4 pa-0"
-      >
-        <div
-          class="
+    <v-container>
+      Player 1: {{ gameStore.currentRoom.player_1 }} VS Player 2: {{ gameStore.currentRoom.player_2 }}
+    </v-container>
+
+    <v-container class="pa-2" fluid>
+      <v-row>
+        <v-col
+            v-for="(cell,index) in 9"
+            class="v-col--cols-4 pa-0"
+        >
+          <div
+              class="
         d-flex
       bg-blue
       justify-center
@@ -22,117 +24,133 @@
       border-solid
       cell
 "
-          @click="checkCell(index)"
-        >
-          {{ board[index] }}
-        </div>
+              @click="checkCell(index)"
+          >
+            {{ gameStore.currentGame.boardState[index] }}
+          </div>
 
-      </v-col>
-    </v-row>
+        </v-col>
+      </v-row>
 
-    <p style="font-size: 5px">Şuanki Oyuncu: {{ moveCount % 2 == 0 ? '1' : '2' }}</p>
+      <p style="font-size: 5px">Şuanki Oyuncu: {{ moveCount % 2 == 0 ? '1' : '2' }}</p>
 
-  </v-container>
+    </v-container>
+
+  </div>
 
 
 </template>
 
 <script setup lang="ts">
 
-  import {ref} from "vue";
-  import {useUserStore} from "@/stores/userStore.ts";
+import {ref} from "vue";
+import {useUserStore} from "@/stores/userStore.ts";
+import CreateLobby from "@/components/CreateLobby.vue";
+import {useGameStore} from "@/stores/gameStore.ts";
+import {Notification} from "@/helpers/notificationHelper.ts"
 
-  var userStore = useUserStore();
+var userStore = useUserStore();
+var gameStore = useGameStore();
 
-  var board = ref([])
 
-  var moveCount = ref(0);
+var moveCount = ref(0);
 
-  function checkCell(index) {
-    board.value[index] = moveCount.value % 2 == 0 ? "X" : "O";
-    moveCount.value++;
+async function checkCell(index) {
 
-    var winner = DeterineWinner(board.value);
-    if (winner == -1) {
-      alert("BERABERE")
-    } else if(winner){
-      alert("Kazanan " + winner)
-    }
+  if (gameStore.currentGame.turn == false && gameStore.currentRoom.player_1 == userStore.username) {
+    // SENİN SIRAN
+  } else {
+    Notification("Senin sıran değil", "warning");
+    return;
   }
 
-  function DeterineWinner(boardToCheck) {
+  gameStore.currentGame.boardState[index] = moveCount.value % 2 == 0 ? "X" : "O";
+  moveCount.value++;
 
-    var board = boardToCheck;
+  var winner = DeterineWinner(gameStore.currentGame.boardState);
+  if (winner == -1) {
+    alert("BERABERE")
+  } else if (winner) {
+    alert("Kazanan " + winner)
+  }
 
-    const n = 3;
+  await gameStore.SetGame(gameStore.gameId, gameStore.currentGame.boardState, !gameStore.currentGame.turn);
+  await gameStore.GetGame(gameStore.gameId);
+}
 
-    for (let i = 0; i < n; i++) {
-      var satırbasi = i * n;
-      var sayac = 1;
+function DeterineWinner(boardToCheck) {
 
-      for (let j = 1; j < n; j++) {
+  var board = boardToCheck;
 
-        if (board[satırbasi] && board[satırbasi] == board[satırbasi + j]) {
-          sayac++
-        }
-      }
-      if (sayac == n) {
-        // alert(board[satırbasi] + "Kazandı")
-        return board[satırbasi]
-      }
+  const n = 3;
 
-    }
+  for (let i = 0; i < n; i++) {
+    var satırbasi = i * n;
+    var sayac = 1;
 
-    for (let i = 0; i < n; i++) {
-      var sutunbasi = i;
-      var sayac = 1;
+    for (let j = 1; j < n; j++) {
 
-      for (let j = 1; j < n; j++) {
-
-        if (board[sutunbasi] && board[sutunbasi] == board[sutunbasi + (j * n)]) {
-          sayac++
-        }
-      }
-      if (sayac == n) {
-        return board[sutunbasi]
-      }
-
-    }
-
-    for (let i = 0; i < n; i++) {
-      var caprazSol = 0;
-      var sayac = 1;
-
-      for (let j = 1; j < n; j++) {
-
-        if (board[caprazSol] && board[caprazSol] == board[caprazSol + (j * (n + 1))]) {
-          sayac++
-        }
-      }
-      if (sayac == n) {
-        return board[caprazSol]
-      }
-
-    }
-
-    for (let i = 0; i < n; i++) {
-      var caprazSag = (n - 1);
-      var sayac = 1;
-
-      for (let j = 1; j < n; j++) {
-
-        if (board[caprazSag] && board[caprazSag] == board[caprazSag + (j * (n - 1))]) {
-          sayac++
-        }
-      }
-      if (sayac == n) {
-        return board[caprazSag]
+      if (board[satırbasi] && board[satırbasi] == board[satırbasi + j]) {
+        sayac++
       }
     }
-    if (moveCount.value == 9) {
-      return -1
+    if (sayac == n) {
+      // alert(board[satırbasi] + "Kazandı")
+      return board[satırbasi]
+    }
+
+  }
+
+  for (let i = 0; i < n; i++) {
+    var sutunbasi = i;
+    var sayac = 1;
+
+    for (let j = 1; j < n; j++) {
+
+      if (board[sutunbasi] && board[sutunbasi] == board[sutunbasi + (j * n)]) {
+        sayac++
+      }
+    }
+    if (sayac == n) {
+      return board[sutunbasi]
+    }
+
+  }
+
+  for (let i = 0; i < n; i++) {
+    var caprazSol = 0;
+    var sayac = 1;
+
+    for (let j = 1; j < n; j++) {
+
+      if (board[caprazSol] && board[caprazSol] == board[caprazSol + (j * (n + 1))]) {
+        sayac++
+      }
+    }
+    if (sayac == n) {
+      return board[caprazSol]
+    }
+
+  }
+
+  for (let i = 0; i < n; i++) {
+    var caprazSag = (n - 1);
+    var sayac = 1;
+
+    for (let j = 1; j < n; j++) {
+
+      if (board[caprazSag] && board[caprazSag] == board[caprazSag + (j * (n - 1))]) {
+        sayac++
+      }
+    }
+    if (sayac == n) {
+      return board[caprazSag]
     }
   }
+  if (moveCount.value == 9) {
+    return -1
+  }
+}
 
 
 </script>
