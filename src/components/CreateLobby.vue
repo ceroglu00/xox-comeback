@@ -36,13 +36,22 @@ async function OyunaKatıl(id) {
 }
 
 async function Başla(roomId) {
-  await gameStore.CreateGame(roomId, []);
+
+  await gameStore.GetLobby(roomId);
+
+  if (!(await gameStore.CheckIfGameExists(roomId))) {
+    await gameStore.CreateGame(roomId, []);
+  }else{
+
+  }
+
+
   await gameStore.GetGame(gameStore.gameId);
 
 
   var id = setInterval(() => {
     gameStore.GetGame(gameStore.gameId);
-  }, 3000)
+  }, 500)
 
 
 }

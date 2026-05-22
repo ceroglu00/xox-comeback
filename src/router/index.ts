@@ -9,6 +9,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import Anasayfa from '../pages/Anasayfa.vue'
 import LoginComponent from "@/components/LoginComponent.vue";
 import GamePage from "@/pages/GamePage.vue";
+import Test from "@/pages/Test.vue";
 
 
 const router = createRouter({
@@ -16,17 +17,17 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            name:"Home",
+            name: "Home",
             component: Anasayfa,
         },
         {
             path: '/login',
-            name:"Login",
+            name: "Login",
             component: LoginComponent,
         },
         {
             path: '/game',
-            name:"Game",
+            name: "Game",
             component: GamePage,
             beforeEnter: (to, from, next) => {
                 if (!localStorage.getItem("username")) {
@@ -38,6 +39,10 @@ const router = createRouter({
                 }
             }
         },
+        {
+            path: "/test",
+            component: Test
+        }
     ],
 })
 

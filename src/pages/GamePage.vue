@@ -57,14 +57,24 @@ var moveCount = ref(0);
 
 async function checkCell(index) {
 
+  var marker = "X";
+
+  // 0 ve player_1 bensem
   if (gameStore.currentGame.turn == false && gameStore.currentRoom.player_1 == userStore.username) {
     // SENİN SIRAN
-  } else {
+    marker="X";
+  } // 1
+  else if (gameStore.currentGame.turn == true && gameStore.currentRoom.player_1 != userStore.username){
+    // Karşının sırası
+    marker = "O"
+  }
+  else {
     Notification("Senin sıran değil", "warning");
     return;
   }
 
-  gameStore.currentGame.boardState[index] = moveCount.value % 2 == 0 ? "X" : "O";
+  // gameStore.currentGame.boardState[index] = moveCount.value % 2 == 0 ? "X" : "O";
+  gameStore.currentGame.boardState[index] = marker;
   moveCount.value++;
 
   var winner = DeterineWinner(gameStore.currentGame.boardState);

@@ -95,6 +95,14 @@ export async function GetGame(gameId) {
     return data
 }
 
+export async function CheckIfGameExists(roomId) {
+    var {data, error} = await supabase.from("game").select()
+        .eq("room", roomId).single();
+    return data
+}
+
+
+
 export async function SetGame(gameId, board, nextPlayer) {
     var {data, error} = await supabase.from("game").update(
         {boardState: board, turn: nextPlayer}

@@ -9,7 +9,7 @@ import {
     MakePlayerJoin,
     CreateGame,
     GetGame,
-    GetRoom, SetGame
+    GetRoom, SetGame, CheckIfGameExists
 } from '../database/database.ts'
 import {Notification} from "@/helpers/notificationHelper.ts";
 
@@ -60,6 +60,16 @@ export const useGameStore = defineStore('gameStore', {
         },
         async SetGame(gameId,boardState,nextPlayer){
             await SetGame(gameId,boardState,nextPlayer);
+        },
+        async CheckIfGameExists(roomId){
+
+            var data = await CheckIfGameExists(roomId);
+
+            if (data){
+                this.gameId = data.id;
+                return true;
+            }
+            return false;
         }
     }
 })
